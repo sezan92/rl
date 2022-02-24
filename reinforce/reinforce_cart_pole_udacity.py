@@ -11,7 +11,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.distributions import Categorical
 
-env = gym.make('CartPole-v0')
+env = gym.make('LunarLander-v2')
 env.seed(0)
 print('observation space:', env.observation_space)
 print('action space:', env.action_space)
@@ -36,7 +36,7 @@ class Policy(nn.Module):
         action = m.sample()
         return action.item(), m.log_prob(action)
 
-policy = Policy().to(device)
+policy = Policy(s_size=env.observation_space.shape[0], a_size=env.action_space.n).to(device)
 optimizer = optim.Adam(policy.parameters(), lr=1e-2)
 
 def reinforce(n_episodes=1000, max_t=1000, gamma=1.0, print_every=100):
