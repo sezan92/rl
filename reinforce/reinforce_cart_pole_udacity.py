@@ -11,7 +11,9 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.distributions import Categorical
 
-env = gym.make('LunarLander-v2')
+ENV_NAME = "LunarLander-v2"
+
+env = gym.make(ENV_NAME)
 env.seed(0)
 print('observation space:', env.observation_space)
 print('action space:', env.action_space)
@@ -19,14 +21,16 @@ print('action space:', env.action_space)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class Policy(nn.Module):
-    def __init__(self, s_size=4, h_size=16, a_size=2):
+    def __init__(self, s_size=4, fc1_size=150, fc2_size=120, a_size=2):
         super(Policy, self).__init__()
-        self.fc1 = nn.Linear(s_size, h_size)
-        self.fc2 = nn.Linear(h_size, a_size)
+        self.fc1 = nn.Linear(s_size, fc1_size)
+        self.fc2 = nn.Linear(fc1_size, fc2_size)
+        self.final = nn.Linear(fc2_size, a_size)
 
     def forward(self, x):
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
+        x = self.final(x)
         return F.softmax(x, dim=1)
     
     def act(self, state):
@@ -85,14 +89,14 @@ plt.ylabel('Score')
 plt.xlabel('Episode #')
 plt.show()
 
-env = gym.make('CartPole-v0')
+env = gym.make(ENV_NAME)
 
 state = env.reset()
-for t in range(1000):
+for t in range(100000):
     action, _ = policy.act(state)
     env.render()
     state, reward, done, _ = env.step(action)
     if done:
-        break 
+        state = env.reset()
 
 env.close()
