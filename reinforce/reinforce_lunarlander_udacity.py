@@ -23,17 +23,6 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 policy = Policy(s_size=env.observation_space.shape[0], a_size=env.action_space.n).to(device)
 optimizer = optim.Adam(policy.parameters(), lr=1e-2)
 
-# TODO: get expected reward, test if it is working
-def get_expected_reward(states, rewards):
-    expected_rewards = []
-    for i in range(len(states)):
-        expected_reward = 0
-        gamma = 1
-        for reward in rewards[i:]: 
-            expected_reward =+ gamma * reward
-            gamma = gamma * 0.99
-        expected_rewards.append(expected_reward)
-    return expected_rewards
 
 def reinforce(n_episodes=1000, max_t=1000, gamma=1.0, print_every=100):
     scores_deque = deque(maxlen=100)
