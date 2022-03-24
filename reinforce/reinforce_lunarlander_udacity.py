@@ -1,3 +1,4 @@
+from expected_reward import get_expected_reward
 import gym
 gym.logger.set_level(40) # suppress warnings (please remove if gives error)
 import numpy as np
@@ -19,7 +20,6 @@ print('action space:', env.action_space)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
-
 policy = Policy(s_size=env.observation_space.shape[0], a_size=env.action_space.n).to(device)
 optimizer = optim.Adam(policy.parameters(), lr=1e-2)
 
@@ -31,21 +31,23 @@ def reinforce(n_episodes=1000, max_t=1000, gamma=1.0, print_every=100):
         saved_log_probs = []
         rewards = []
         state = env.reset()
+        states = [state]
         for t in range(max_t):
             action, log_prob = policy.act(state)
             saved_log_probs.append(log_prob)
             state, reward, done, _ = env.step(action)
             rewards.append(reward)
+            states.append(state)
             if done:
                 break 
         scores_deque.append(sum(rewards))
         scores.append(sum(rewards))
-        
-        discounts = [gamma**i for i in range(len(rewards)+1)]
-        R = sum([a*b for a,b in zip(discounts, rewards)])
+
+        expected_rewards = get_expected_reward(states, rewards)
         
         policy_loss = []
-        for log_prob in saved_log_probs:
+        for i, log_prob in enumerate(saved_log_probs):
+            R = expected_rewards[i]
             policy_loss.append(-log_prob * R)
         policy_loss = torch.cat(policy_loss).sum()
         
