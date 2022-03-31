@@ -1,4 +1,4 @@
-from expected_reward import get_expected_reward
+from expected_reward import get_expected_reward, get_state_values
 import gym
 gym.logger.set_level(40) # suppress warnings (please remove if gives error)
 import numpy as np
@@ -43,12 +43,13 @@ def reinforce(n_episodes=1000, max_t=1000, gamma=1.0, print_every=100):
         scores_deque.append(sum(rewards))
         scores.append(sum(rewards))
 
-        expected_rewards = get_expected_reward(states, rewards)
+        expected_rewards = get_expected_reward(rewards)
+        state_values = get_state_values(rewards)
         
         policy_loss = []
         for i, log_prob in enumerate(saved_log_probs):
-            R = expected_rewards[i]
-            policy_loss.append(-log_prob * R)
+            A = expected_rewards[i] - state_values[i]
+            policy_loss.append(-log_prob * A)
         policy_loss = torch.cat(policy_loss).sum()
         
         optimizer.zero_grad()
