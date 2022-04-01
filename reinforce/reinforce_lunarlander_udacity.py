@@ -43,7 +43,7 @@ def reinforce(n_episodes=1000, max_t=1000, gamma=1.0, print_every=100):
         scores_deque.append(sum(rewards))
         scores.append(sum(rewards))
 
-        expected_rewards = get_expected_reward(rewards)
+        expected_rewards = get_expected_reward(rewards, gamma)
         state_values = get_state_values(rewards)
         
         policy_loss = []
@@ -64,7 +64,7 @@ def reinforce(n_episodes=1000, max_t=1000, gamma=1.0, print_every=100):
         
     return scores
     
-scores = reinforce()
+scores = reinforce(gamma=0.99, max_t=10000)
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
