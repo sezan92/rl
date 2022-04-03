@@ -24,7 +24,7 @@ policy = Policy(s_size=env.observation_space.shape[0], a_size=env.action_space.n
 optimizer = optim.Adam(policy.parameters(), lr=1e-2)
 
 
-def reinforce(n_episodes=1000, max_t=1000, gamma=1.0, print_every=100):
+def reinforce(n_episodes=1000, max_t=1000, gamma=1.0, print_every=100, epsilon=0.1, epsilon_decay = 0.999, epsilon_min=0.1):
     scores_deque = deque(maxlen=100)
     scores = []
     for i_episode in range(1, n_episodes+1):
@@ -33,7 +33,11 @@ def reinforce(n_episodes=1000, max_t=1000, gamma=1.0, print_every=100):
         state = env.reset()
         states = [state]
         for t in range(max_t):
-            action, log_prob = policy.act(state)
+            if np.random.random() > epsilon:
+                action = np.random.choice([0, 1, 2, 3], p=[0.25, 0.25, 0.25, 0.25])
+                log_prob = torch.from_numpy(np.array([np.log(0.25)]))
+            else:
+                action, log_prob = policy.act(state)
             saved_log_probs.append(log_prob)
             state, reward, done, _ = env.step(action)
             rewards.append(reward)
@@ -55,6 +59,10 @@ def reinforce(n_episodes=1000, max_t=1000, gamma=1.0, print_every=100):
         optimizer.zero_grad()
         policy_loss.backward()
         optimizer.step()
+        if epsilon <= epsilon_min:
+            epsilon = epsilon_min
+        else:
+            epsilon = epsilon * epsilon_decay
         
         if i_episode % print_every == 0:
             print('Episode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_deque)))
@@ -64,7 +72,7 @@ def reinforce(n_episodes=1000, max_t=1000, gamma=1.0, print_every=100):
         
     return scores
     
-scores = reinforce(gamma=0.99, max_t=10000)
+scores = reinforce(gamma=0.99, max_t=10000, epsilon=0.99, epsilon_decay=0.999)
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
