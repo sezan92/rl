@@ -72,7 +72,7 @@ def reinforce(n_episodes=1000, max_t=1000, gamma=1.0, print_every=100, epsilon=0
         
     return scores
     
-scores = reinforce(gamma=0.99, max_t=10000, epsilon=0.99, epsilon_decay=0.999)
+scores = reinforce(gamma=0.99, max_t=10000, epsilon=0.5, epsilon_decay=0.999)
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
