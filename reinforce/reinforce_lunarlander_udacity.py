@@ -3,7 +3,7 @@ import gym
 gym.logger.set_level(40) # suppress warnings (please remove if gives error)
 import numpy as np
 from collections import deque
-import matplotlib.pyplot as plt
+from util import plot_scores
 from policy import Policy
 import torch
 torch.manual_seed(0) # set random seed
@@ -74,13 +74,9 @@ def reinforce(n_episodes=1000, max_t=1000, gamma=1.0, print_every=100, epsilon=0
     
 scores = reinforce(gamma=0.8, max_t=10000, epsilon=0.9, epsilon_decay=0.999)
 
-fig = plt.figure()
-ax = fig.add_subplot(111)
-plt.plot(np.arange(1, len(scores)+1), scores)
-plt.ylabel('Score')
-plt.xlabel('Episode #')
-plt.show()
+plot_scores(scores)
 
+# TODO: infer on an environment module
 env = gym.make(ENV_NAME)
 
 state = env.reset()
