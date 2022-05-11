@@ -1,3 +1,4 @@
+import numpy as np
 from matplotlib import pyplot as plt
 
 def plot_scores(scores):
@@ -7,3 +8,4 @@ def plot_scores(scores):
     plt.ylabel('Score')
     plt.xlabel('Episode #')
     plt.show()
+    return fig
