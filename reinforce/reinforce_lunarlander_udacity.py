@@ -77,6 +77,7 @@ scores = reinforce(gamma=0.8, max_t=10000, epsilon=0.9, epsilon_decay=0.999)
 plot_scores(scores)
 
 # TODO: infer on an environment module
+# TODO: use argument parser, standard if __name__ procedure
 env = gym.make(ENV_NAME)
 
 state = env.reset()
