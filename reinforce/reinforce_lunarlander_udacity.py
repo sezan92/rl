@@ -1,3 +1,4 @@
+import argparse
 from expected_reward import get_expected_reward, get_state_values
 import gym
 gym.logger.set_level(40) # suppress warnings (please remove if gives error)
@@ -12,11 +13,30 @@ import torch.optim as optim
 
 ENV_NAME = "LunarLander-v2"
 
-env = gym.make(ENV_NAME)
-env.seed(0)
-print('observation space:', env.observation_space)
-print('action space:', env.action_space)
+def setup_environment(env_name):
+    """
+    Setup the environment
+    """
+    print(f'INFO: Setting up {env_name}')
+    env = gym.make(env_name)
+    env.seed(0)
+    print(f'INFO: observation space: {env.observation_space}')
+    print(f'INFO: action space: {env.action_space}')
+    return env
+    
+def test_env(env, policy):
+    """
+    Test the environment with a given policy.
+    """
+    state = env.reset()
+    for t in range(100000):
+        action, _ = policy.act(state)
+        env.render()
+        state, reward, done, _ = env.step(action)
+        if done:
+            state = env.reset()
 
+    env.close()
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
@@ -76,16 +96,8 @@ scores = reinforce(gamma=0.8, max_t=10000, epsilon=0.9, epsilon_decay=0.999)
 
 plot_scores(scores)
 
-# TODO: infer on an environment module
-# TODO: use argument parser, standard if __name__ procedure
-env = gym.make(ENV_NAME)
-
-state = env.reset()
-for t in range(100000):
-    action, _ = policy.act(state)
-    env.render()
-    state, reward, done, _ = env.step(action)
-    if done:
-        state = env.reset()
-
-env.close()
+if __name__ == "__main__":
+    parser = argparse.ArgumentDefaultsHelpFormatter()
+    parser.add_argument("env", type=str, help="Environment name. Currently supported ['LunarLander-v2']")
+    parser.add_argument("--train", action_store=True, help="Flag to train or play")
+    parser.add_argument("--save_model_path", type=str, help="Save the weights of the model.", default="reinforce.pth")
