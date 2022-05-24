@@ -44,7 +44,7 @@ policy = Policy(s_size=env.observation_space.shape[0], a_size=env.action_space.n
 optimizer = optim.Adam(policy.parameters(), lr=1e-2)
 
 
-def reinforce(n_episodes=1000, max_t=1000, gamma=1.0, print_every=100, epsilon=0.1, epsilon_decay = 0.999, epsilon_min=0.1):
+def reinforce(env, model_weights_path, n_episodes=1000, max_t=1000, gamma=1.0, print_every=100, epsilon=0.1, epsilon_decay = 0.999, epsilon_min=0.1):
     scores_deque = deque(maxlen=100)
     scores = []
     for i_episode in range(1, n_episodes+1):
@@ -85,19 +85,24 @@ def reinforce(n_episodes=1000, max_t=1000, gamma=1.0, print_every=100, epsilon=0
             epsilon = epsilon * epsilon_decay
         
         if i_episode % print_every == 0:
-            print('Episode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_deque)))
+            print('INFO: Episode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_deque)))
         if np.mean(scores_deque)>=195.0:
-            print('Environment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode-100, np.mean(scores_deque)))
+            print('INFO: Environment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode-100, np.mean(scores_deque)))
             break
-        
+    print(f'INFO: Saving the weights in {model_weights_path}')
+    torch.save(policy.state_dict(), model_weights_path)
     return scores
     
-scores = reinforce(gamma=0.8, max_t=10000, epsilon=0.9, epsilon_decay=0.999)
-
-plot_scores(scores)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentDefaultsHelpFormatter()
     parser.add_argument("env", type=str, help="Environment name. Currently supported ['LunarLander-v2']")
     parser.add_argument("--train", action_store=True, help="Flag to train or play")
     parser.add_argument("--save_model_path", type=str, help="Save the weights of the model.", default="reinforce.pth")
+
+    args = parser.parse_args()
+    env = setup_environment(args.env)
+    if args.train:
+        scores = reinforce(env, args.save_model_path, gamma=0.8, max_t=10000, epsilon=0.9, epsilon_decay=0.999)
+        plot_scores(scores)
+        # TODO: test the script asap.
