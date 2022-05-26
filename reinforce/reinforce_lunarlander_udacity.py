@@ -7,7 +7,9 @@ from collections import deque
 from util import plot_scores
 from policy import Policy
 import torch
-torch.manual_seed(0) # set random seed
+
+RANDOM_SEED = 0
+torch.manual_seed(RANDOM_SEED) # set random seed
 
 import torch.optim as optim
 
@@ -37,16 +39,11 @@ def test_env(env, policy):
             state = env.reset()
 
     env.close()
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-
-policy = Policy(s_size=env.observation_space.shape[0], a_size=env.action_space.n).to(device)
-optimizer = optim.Adam(policy.parameters(), lr=1e-2)
-
-
-def reinforce(env, model_weights_path, n_episodes=1000, max_t=1000, gamma=1.0, print_every=100, epsilon=0.1, epsilon_decay = 0.999, epsilon_min=0.1):
+def reinforce(env, policy, model_weights_path, n_episodes=1000, max_t=1000, gamma=1.0, print_every=100, epsilon=0.1, epsilon_decay = 0.999, epsilon_min=0.1):
     scores_deque = deque(maxlen=100)
     scores = []
+    optimizer = optim.Adam(policy.parameters(), lr=1e-2)
     for i_episode in range(1, n_episodes+1):
         saved_log_probs = []
         rewards = []
@@ -99,10 +96,11 @@ if __name__ == "__main__":
     parser.add_argument("env", type=str, help="Environment name. Currently supported ['LunarLander-v2']")
     parser.add_argument("--train", action_store=True, help="Flag to train or play")
     parser.add_argument("--save_model_path", type=str, help="Save the weights of the model.", default="reinforce.pth")
-
     args = parser.parse_args()
     env = setup_environment(args.env)
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    policy = Policy(s_size=env.observation_space.shape[0], a_size=env.action_space.n).to(device)
     if args.train:
-        scores = reinforce(env, args.save_model_path, gamma=0.8, max_t=10000, epsilon=0.9, epsilon_decay=0.999)
+        scores = reinforce(env, policy, args.save_model_path, gamma=0.8, max_t=10000, epsilon=0.9, epsilon_decay=0.999)
         plot_scores(scores)
         # TODO: test the script asap.
