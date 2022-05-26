@@ -92,7 +92,7 @@ def reinforce(env, policy, model_weights_path, n_episodes=1000, max_t=1000, gamm
     
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentDefaultsHelpFormatter()
+    parser = argparse.ArgumentDefaultsHelpFormatter("Help")
     parser.add_argument("env", type=str, help="Environment name. Currently supported ['LunarLander-v2']")
     parser.add_argument("--train", action_store=True, help="Flag to train or play")
     parser.add_argument("--save_model_path", type=str, help="Save the weights of the model.", default="reinforce.pth")
