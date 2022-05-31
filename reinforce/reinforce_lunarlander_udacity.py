@@ -92,10 +92,12 @@ def reinforce(env, policy, model_weights_path, n_episodes=1000, max_t=1000, gamm
     
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentDefaultsHelpFormatter("Help")
+    parser = argparse.ArgumentParser()
     parser.add_argument("env", type=str, help="Environment name. Currently supported ['LunarLander-v2']")
-    parser.add_argument("--train", action_store=True, help="Flag to train or play")
+    parser.add_argument("--train", action="store_true", help="Flag to train or not")
     parser.add_argument("--save_model_path", type=str, help="Save the weights of the model.", default="reinforce.pth")
+    parser.add_argument("--infer", action="store_true", help="Flag to infer. If it is given, the path to the weight files must be given.")
+    parser.add_argument("--infer_weight", type=str, help="Weight file to use for inference. Only used if --test flag is used. Default:None")
     args = parser.parse_args()
     env = setup_environment(args.env)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -103,4 +105,9 @@ if __name__ == "__main__":
     if args.train:
         scores = reinforce(env, policy, args.save_model_path, gamma=0.8, max_t=10000, epsilon=0.9, epsilon_decay=0.999)
         plot_scores(scores)
-        # TODO: test the script asap.
+    elif args.infer:
+        if args.infer_weight:
+            policy.load_state_dict(torch.load(args.infer_weight))
+            test_env(env, policy)
+        else:
+            raise ValueError('inference not given to --infer_weight.')
