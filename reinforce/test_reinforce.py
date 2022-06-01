@@ -1,6 +1,7 @@
 import pytest
 from expected_reward import get_expected_reward, get_state_values
 
+
 @pytest.mark.parametrize("rewards, expected",
 [([1], [1]),
 ([0, 1], [0.99, 1]),

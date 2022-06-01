@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
+
 def plot_scores(scores):
     fig = plt.figure()
     ax = fig.add_subplot(111)

@@ -1,19 +1,21 @@
 import argparse
-from expected_reward import get_expected_reward, get_state_values
+
 import gym
+from expected_reward import get_expected_reward, get_state_values
+
 gym.logger.set_level(40) # suppress warnings (please remove if gives error)
-import numpy as np
 from collections import deque
-from util import plot_scores
-from policy import Policy
+
+import numpy as np
 import torch
+from policy import Policy
+from util import plot_scores
 
 RANDOM_SEED = 0
 torch.manual_seed(RANDOM_SEED) # set random seed
 
 import torch.optim as optim
 
-ENV_NAME = "LunarLander-v2"
 
 def setup_environment(env_name):
     """
@@ -98,6 +100,10 @@ if __name__ == "__main__":
     parser.add_argument("--save_model_path", type=str, help="Save the weights of the model.", default="reinforce.pth")
     parser.add_argument("--infer", action="store_true", help="Flag to infer. If it is given, the path to the weight files must be given.")
     parser.add_argument("--infer_weight", type=str, help="Weight file to use for inference. Only used if --test flag is used. Default:None")
+    parser.add_argument("--gamma", type=float, default=0.8, help="Discount factor for future rewards. Default: 0.8. Only if --train argument is given.")
+    parser.add_argument("--epoch", type=int, default=1000, help="Number of epochs. Default: 1000. Only if --train set is set.")
+    parser.add_argument("--epsilon", type=float, default=0.9, help="Epsilon for exploration. Default: 0.9. Only if --train flag is set.")
+    parser.add_argument("--epsilon_decay", type=float, default=0.999, help="Epsilon decay. Default: 0.999. Only if --train flag is set.")
     args = parser.parse_args()
     env = setup_environment(args.env)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
