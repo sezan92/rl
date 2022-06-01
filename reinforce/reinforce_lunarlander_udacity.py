@@ -109,7 +109,7 @@ if __name__ == "__main__":
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     policy = Policy(s_size=env.observation_space.shape[0], a_size=env.action_space.n).to(device)
     if args.train:
-        scores = reinforce(env, policy, args.save_model_path, gamma=0.8, max_t=10000, epsilon=0.9, epsilon_decay=0.999)
+        scores = reinforce(env, policy, args.save_model_path, gamma=args.gamma, max_t=args.epoch, epsilon=args.epsilon, epsilon_decay=args.epsilon_decay)
         plot_scores(scores)
     elif args.infer:
         if args.infer_weight:
