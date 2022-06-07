@@ -72,7 +72,7 @@ def reinforce(env, policy, model_weights_path, n_episodes=1000, max_t=1000, gamm
         policy_loss = []
         for i, log_prob in enumerate(saved_log_probs):
             A = expected_rewards[i] - state_values[i]
-            policy_loss.append(-log_prob * A)
+            policy_loss.append((-log_prob * A).float())
         policy_loss = torch.cat(policy_loss).sum()
         
         optimizer.zero_grad()
@@ -117,3 +117,5 @@ if __name__ == "__main__":
             test_env(env, policy)
         else:
             raise ValueError('inference not given to --infer_weight.')
+    else:
+        raise ValueError('--train or --infer must be given.')
