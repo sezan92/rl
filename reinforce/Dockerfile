@@ -1,3 +1,4 @@
+ARG DEBIAN_FRONTEND=noninteractive
 FROM nvidia/cuda:11.1-base-ubuntu20.04
 RUN rm /etc/apt/sources.list.d/cuda.list
 RUN rm /etc/apt/sources.list.d/nvidia-ml.list
