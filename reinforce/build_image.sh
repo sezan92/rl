@@ -1,1 +1,1 @@
-docker build -t initial .
+docker build -t reinforce .
