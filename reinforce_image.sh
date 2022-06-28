@@ -1,1 +1,1 @@
-docker build -t reinforce .
+docker build -f reinforce.Dockerfile -t reinforce .

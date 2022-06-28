@@ -1,5 +1,5 @@
 import pytest
-from expected_reward import get_expected_reward, get_state_values
+from rl.expected_reward import get_expected_reward, get_state_values
 
 
 @pytest.mark.parametrize("rewards, expected",
