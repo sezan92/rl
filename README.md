@@ -2,6 +2,15 @@
 
 ## Reinforce
 
+### Build image
+```sh
+bash reinforce_image.sh
+```
+### Run the container with gpu
+```sh
+docker run --rm --gpus all -it reinforce:latest 
+```
+
 ### Discrete on Lunarlander-v2 Environment
 ***train***
 ```
