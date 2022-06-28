@@ -14,6 +14,6 @@ from rl.expected_reward import get_expected_reward, get_state_values
 ([0, 0, 1], [0.9801, 0.99, 1])
 ])
 def test_get_expected_reward(rewards, expected):
-    assert get_expected_reward(rewards) == expected
+    assert get_expected_reward(rewards,0.99) == expected
 
 # TODO: get_state_values
