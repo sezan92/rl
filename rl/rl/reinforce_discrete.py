@@ -1,15 +1,14 @@
 import argparse
 
 import gym
-from expected_reward import get_expected_reward, get_state_values
+from rl.expected_reward import get_expected_reward, get_state_values
 
-gym.logger.set_level(40) # suppress warnings (please remove if gives error)
 from collections import deque
 
 import numpy as np
 import torch
-from policy import Policy
-from util import plot_scores
+from rl.policy import Policy
+from rl.util import plot_scores
 
 RANDOM_SEED = 0
 torch.manual_seed(RANDOM_SEED) # set random seed

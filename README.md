@@ -2,15 +2,25 @@
 
 ## Reinforce
 
-### Discrete on Lunarlander-v2 Environment
-***train***
+### Build image
+```sh
+bash reinforce_image.sh
 ```
-python3 reinforce/reinforce_discrete.py LunarLander-v2 --train 
-```
-***test***
-```
-python3 reinforce/reinforce_discrete.py LunarLander-v2 --infer --infer_weight /path/to/saved/weight
+### Run the container with gpu
+```sh
+docker run --rm --gpus all -v $(pwd)/tests:/tests -it reinforce:latest 
 ```
 
-### TODO
-- [] Write optional arguments
+#### Discrete on Lunarlander-v2 Environment
+***train***
+```sh
+python3 reinforce/reinforce_discrete.py LunarLander-v2 --train 
+```
+***infer***
+```sh
+python3 reinforce/reinforce_discrete.py LunarLander-v2 --infer --infer_weight /path/to/saved/weight
+```
+***test***
+```sh
+pytest /tests/test_*.py
+```
