@@ -1,5 +1,6 @@
 FROM nvidia/cuda:11.1-base-ubuntu20.04
 ENV DEBIAN_FRONTEND=noninteractive
+ENV DISPLAY = ${DISPLAY}
 COPY requirements.txt /requirements.txt
 COPY rl /rl
 COPY setup.py /rl/setup.py
