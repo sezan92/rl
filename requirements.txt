@@ -3,3 +3,4 @@ gym[all] == 0.7.4
 matplotlib==3.5.2
 pytest==7.1.2
 torch == 1.11.0
+jupyterlab==3.4.4
