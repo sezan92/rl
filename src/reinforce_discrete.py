@@ -1,13 +1,15 @@
 import argparse
 
 from rl.policy import Policy
-from rl.util import plot_scores, setup_environment, test_env
+from rl.util import plot_scores, setup_environment  # , test_env
 from rl.reinforce import reinforce_discrete
+from rl.util import test_env
+import numpy as np
 import torch
 
 RANDOM_SEED = 0
 torch.manual_seed(RANDOM_SEED)  # set random seed
-
+np.random.seed(RANDOM_SEED)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -51,17 +53,41 @@ if __name__ == "__main__":
         help="Number of epochs. Default: 1000. Only if --train set is set.",
     )
     parser.add_argument(
-        "--epsilon",
+        "--learning_rate",
         type=float,
-        default=0.9,
-        help="Epsilon for exploration. Default: 0.9." + "Only if --train flag is set.",
+        default=0.001,
+        help="Learning rate. Default: 0.001",
     )
     parser.add_argument(
-        "--epsilon_decay",
-        type=float,
-        default=0.999,
-        help="Epsilon decay. Default: 0.999. Only if --train flag is set.",
+        "--max_t", type=int, default=1000, help="maximum steps per episode"
     )
+    parser.add_argument(
+        "--plot_show",
+        action="store_true",
+        help="To plot the scores or not. Will work if --train is used.",
+    )
+    parser.add_argument(
+        "--plot_fig_path",
+        type=str,
+        default="/plot.png",
+        help="To save the plot of scores. Will work if --train is used. Default: /plot.png",
+    )
+    parser.add_argument(
+        "--infer_video",
+        type=str,
+        default="",
+        help="Save the inference performance in video. Only will work if --infer is used.",
+    )
+    parser.add_argument(
+        "--infer_video_fps",
+        type=int,
+        default=10,
+        help="Rendered video FPS. --infer must be given.",
+    )
+    parser.add_argument(
+        "--infer_render", action="store_true", help="To render or not. Default: False."
+    )
+
     args = parser.parse_args()
     env = setup_environment(args.env)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -74,15 +100,21 @@ if __name__ == "__main__":
             policy,
             args.save_model_path,
             gamma=args.gamma,
-            max_t=args.epoch,
-            epsilon=args.epsilon,
-            epsilon_decay=args.epsilon_decay,
+            n_episodes=args.epoch,
+            max_t=args.max_t,
+            learning_rate=args.learning_rate,
         )
-        plot_scores(scores)
+        plot_scores(scores, show=args.plot_show, plot_fig_path=args.plot_fig_path)
     elif args.infer:
         if args.infer_weight:
             policy.load_state_dict(torch.load(args.infer_weight))
-            test_env(env, policy)
+            test_env(
+                env,
+                policy,
+                render=args.infer_render,
+                video_path=args.infer_video,
+                fps=args.infer_video_fps,
+            )
         else:
             raise ValueError("inference not given to --infer_weight.")
     else:
