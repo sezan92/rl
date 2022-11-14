@@ -5,7 +5,11 @@ import gym
 import numpy as np
 from matplotlib import pyplot as plt
 
-
+def moving_average(a, n=100) :
+    ret = np.cumsum(a, dtype=float)
+    ret[n:] = ret[n:] - ret[:-n]
+    return ret[n - 1:] / n
+    
 def setup_environment(env_name):
     env = gym.make(env_name)
     return env

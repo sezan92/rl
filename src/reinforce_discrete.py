@@ -4,6 +4,7 @@ from rl.policy import Policy
 from rl.util import plot_scores, setup_environment  # , test_env
 from rl.reinforce import reinforce_discrete
 from rl.util import test_env
+from rl.util import moving_average
 import numpy as np
 import torch
 
@@ -104,6 +105,7 @@ if __name__ == "__main__":
             max_t=args.max_t,
             learning_rate=args.learning_rate,
         )
+        scores = moving_average(scores)
         plot_scores(scores, show=args.plot_show, plot_fig_path=args.plot_fig_path)
     elif args.infer:
         if args.infer_weight:
