@@ -80,17 +80,35 @@ if __name__ == "__main__":
         help="Save the inference performance in video. Only will work if --infer is used.",
     )
     parser.add_argument(
-        "--infer_video_fps",
+        "--video_fps",
         type=int,
         default=10,
         help="Rendered video FPS. --infer must be given.",
+    )
+    parser.add_argument(
+        "--train_video_dir", type=str, default="", help="Directory to save video"
+    )
+    parser.add_argument(
+        "--train_video_every",
+        type=int,
+        required=False,
+        help="Parameter to save video after every certain number of episodes.",
     )
     parser.add_argument(
         "--infer_render", action="store_true", help="To render or not. Default: False."
     )
 
     args = parser.parse_args()
-    env = setup_environment(args.env)
+    if args.train_video_dir:
+        if not args.train_video_every:
+            raise ValueError(
+                "If --train_video_dir is given, then --train_video_every is required."
+            )
+    if args.train_video_dir:
+        mode = "rgb_array"
+    else:
+        mode = "human"
+    env = setup_environment(args.env, mode)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     policy = Policy(
         s_size=env.observation_space.shape[0], a_size=env.action_space.n
@@ -104,9 +122,16 @@ if __name__ == "__main__":
             n_episodes=args.epoch,
             max_t=args.max_t,
             learning_rate=args.learning_rate,
+            video_dir=args.train_video_dir,
+            video_every=args.train_video_every,
+            fps=args.video_fps,
         )
         scores = moving_average(scores)
-        plot_scores(scores, show=args.plot_show, plot_fig_path=args.plot_fig_path)
+        plot_scores(
+            scores,
+            show=args.plot_show,
+            plot_fig_path=args.plot_fig_path,
+        )
     elif args.infer:
         if args.infer_weight:
             policy.load_state_dict(torch.load(args.infer_weight))
@@ -115,7 +140,7 @@ if __name__ == "__main__":
                 policy,
                 render=args.infer_render,
                 video_path=args.infer_video,
-                fps=args.infer_video_fps,
+                fps=args.video_fps,
             )
         else:
             raise ValueError("inference not given to --infer_weight.")

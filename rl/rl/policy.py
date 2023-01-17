@@ -18,7 +18,7 @@ class Policy(nn.Module):
         x = F.relu(self.fc2(x))
         x = self.final(x)
         return F.softmax(x, dim=1)
-    
+
     def act(self, state):
         state = torch.from_numpy(state).float().unsqueeze(0).to(device)
         probs = self.forward(state).cpu()

@@ -5,13 +5,15 @@ import gym
 import numpy as np
 from matplotlib import pyplot as plt
 
-def moving_average(a, n=100) :
+
+def moving_average(a, n=100):
     ret = np.cumsum(a, dtype=float)
     ret[n:] = ret[n:] - ret[:-n]
-    return ret[n - 1:] / n
-    
-def setup_environment(env_name):
-    env = gym.make(env_name)
+    return ret[n - 1 :] / n
+
+
+def setup_environment(env_name, mode):
+    env = gym.make(env_name, render_mode=mode)
     return env
 
 
@@ -32,12 +34,12 @@ def plot_scores(scores, show=True, plot_fig_path=None):
 def _write_video(frames, fps, output_path):
     out = cv2.VideoWriter(
         output_path,
-        cv2.VideoWriter_fourcc("M", "J", "P", "G"),
+        cv2.VideoWriter_fourcc("m", "p", "4", "v"),
         fps,
-        (frames[0].shape[0], frames[0].shape[1]),
+        (frames[0].shape[1], frames[0].shape[0]),
     )
     for frame in frames:
-        out.write(frame)
+        out.write(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
     out.release()
 
 
@@ -45,7 +47,7 @@ def test_env(
     env,
     policy,
     max_t=500,
-    episode=5,
+    test_episode=5,
     render=False,
     video_path="",
     fps=10,
@@ -54,29 +56,26 @@ def test_env(
     videos = []
     if video_path:
         os.makedirs(video_path, exist_ok=True)
-        mode = "rgb_array"
-    else:
-        mode = "human"
-    for e in range(episode):
+    for e in range(test_episode):
         rendered_frames = []
-        state = env.reset()
+        state, _ = env.reset()
         sum_reward = 0
         for t in range(max_t):
             action, _ = policy.act(state)
-            state, reward, done, _ = env.step(action)
+            state, reward, done, _, _ = env.step(action)
             if render:
-                rendered_frame = env.render(mode=mode)
+                rendered_frame = env.render()
                 rendered_frames.append(rendered_frame)
             sum_reward += reward
             if done:
                 break
-        print(f"INFO: Episode: {e} , total reward: {sum_reward}")
+        print(f"INFO: Test Episode: {e} , total reward: {sum_reward}")
         rewards.append(sum_reward)
         videos.append(rendered_frames)
-    for i in range(videos):
-        print(f"INFO: Saving video of episode: {i}")
+    for i in range(len(videos)):
+        print(f"INFO: Saving video of test episode: {i}")
         _write_video(
-            rendered_frames,
+            videos[i],
             fps,
-            os.path.join(video_path + f"episode_{i}_video.mp4"),
+            os.path.join(video_path, f"trial_{i}_video.avi"),
         )
