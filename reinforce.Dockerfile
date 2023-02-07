@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:2.9.1-gpu-jupyter
+FROM pytorch/pytorch:1.13.0-cuda11.6-cudnn8-devel
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DISPLAY = ${DISPLAY}
 RUN echo "export DISPLAY=:${DISPLAY}" >> /etc/profile

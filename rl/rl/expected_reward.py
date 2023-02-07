@@ -4,11 +4,12 @@ def get_expected_reward(rewards, gamma_init=1):
     for i in range(len(rewards)):
         expected_reward = 0
         gamma = 1
-        for reward in rewards[i:]: 
+        for reward in rewards[i:]:
             expected_reward += gamma * reward
             gamma = gamma * gamma_init
         expected_rewards.append(expected_reward)
     return expected_rewards
+
 
 def get_state_values(rewards):
     values = []
